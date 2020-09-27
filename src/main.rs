@@ -14,10 +14,10 @@ impl LifeCell {
         assert_eq!(self.s_reg >> 4, 0);
         assert_eq!(self.q_reg >> 4, 0);
 
-        if le_in == 1 && (self.a_reg & 0b0010) >> 1 == 1 {
+        if le_in == 1 || (self.a_reg & 0b0010) >> 1 == 1 {
             self.q_reg = self.s_reg;
         }
-        if se_in == 1 && self.a_reg & 0b0001 == 1 {
+        if se_in == 1 || self.a_reg & 0b0001 == 1 {
             let lut_q = ((self.lut_config >> self.a_reg) & 1) as u8;
             self.s_reg = (self.s_reg >> 1) | (lut_q << 3);
         }
@@ -49,14 +49,12 @@ fn main() {
             lut_config: 0xF300,
             a_config: 0,
             a_reg: (i & 0xF) as u8,
-            s_reg: 0,
-            q_reg: 5,
+            s_reg: 0x6,
+            q_reg: 0x5,
         });
     }
 
     let mut v = v.into_boxed_slice();
-
-    v[0].s_reg = 0x0;
 
     let mut n = 0;
 
@@ -78,9 +76,11 @@ fn main() {
                 se_in = v[i - 1].se_out();
                 le_in = v[i - 1].le_out();
             } else {
-                a_in = v0_a_in;
+                a_in = (n & 0xF) as u8;
+                //a_in = v0_a_in;
                 se_in = v0_se_in;
-                le_in = v0_le_in;
+                //le_in = v0_le_in;
+                le_in = 0;
             }
             v[i].step(a_in, se_in, le_in);
         }
