@@ -46,7 +46,7 @@ fn main() {
     let mut v = Vec::with_capacity(CELL_COUNT);
     for i in 0..CELL_COUNT {
         v.push(LifeCell {
-            lut_config: 0xF300,
+            lut_config: 0x0184u16.wrapping_add(0x3B * i as u16),
             a_config: 0,
             a_reg: (i & 0xF) as u8,
             s_reg: 0x6,
@@ -76,11 +76,11 @@ fn main() {
                 se_in = v[i - 1].se_out();
                 le_in = v[i - 1].le_out();
             } else {
-                a_in = (n & 0xF) as u8;
-                //a_in = v0_a_in;
+                //a_in = (n & 0xF) as u8;
+                a_in = v0_a_in;
                 se_in = v0_se_in;
-                //le_in = v0_le_in;
-                le_in = 0;
+                le_in = v0_le_in;
+                //le_in = 0;
             }
             v[i].step(a_in, se_in, le_in);
         }
